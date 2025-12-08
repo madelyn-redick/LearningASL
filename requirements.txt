@@ -1,11 +1,22 @@
+# Deep Learning Framework
 torch>=2.0.0
 torchvision>=0.15.0
-mediapipe
-numpy
-pandas
-opencv-python
-matplotlib
-kagglehub
-Pillow
-scikit-learn
 
+# Computer Vision & Pose Estimation
+opencv-python>=4.8.0
+mediapipe>=0.10.0
+Pillow>=10.0.0
+
+# Data Processing
+numpy>=1.24.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
+
+# Visualization
+matplotlib>=3.7.0
+
+# Data Acquisition
+kagglehub>=0.1.0
+
+# Pretrained Models (optional - for train_ptn_pretrained.py)
+transformers>=4.30.0

@@ -1,5 +1,5 @@
 """
-Pose Transformer Network (PTN) definition.
+Pose Transformer Network (PTN) definition and Combined CNN-Transformer Model.
 """
 
 import torch
@@ -38,7 +38,7 @@ class PositionalEncoding(nn.Module):
 
 class PoseTransformer(nn.Module):
     """
-    Transformer-based model for classifying sequences of pose keypoints.
+    Transformer-based model for classifying sequences of pose keypoints or CNN features.
 
     Input: (batch_size, seq_len, input_dim)
     Output: (batch_size, num_classes)
@@ -46,7 +46,7 @@ class PoseTransformer(nn.Module):
 
     def __init__(
         self,
-        input_dim: int = 42,       # 21 landmarks * 2 (x, y)
+        input_dim: int = 42,       # 21 landmarks * 2 (x, y) OR 512 for CNN features
         num_classes: int = 10,
         d_model: int = 128,
         nhead: int = 4,
@@ -57,7 +57,7 @@ class PoseTransformer(nn.Module):
     ):
         super().__init__()
 
-        # Linear projection from raw coordinate space to latent d_model space
+        # Linear projection from input space to latent d_model space
         self.input_proj = nn.Linear(input_dim, d_model)
         
         self.pos_encoder = PositionalEncoding(d_model, max_len=max_len, dropout=dropout)
@@ -97,10 +97,41 @@ class PoseTransformer(nn.Module):
 
         # 4. Global Average Pooling
         # Average across the time dimension (T) -> (B, d_model)
-        # (Masking padding tokens would be better, but simple averaging works okay for fixed length)
         x = x.mean(dim=1)
 
         # 5. Classifier
         logits = self.classifier(x) # (B, num_classes)
         return logits
 
+
+class ASLSequenceModel(nn.Module):
+    """
+    End-to-End model: CNN Feature Extractor -> Transformer -> Classifier
+    """
+    def __init__(self, feature_extractor, transformer):
+        super().__init__()
+        self.feature_extractor = feature_extractor
+        self.transformer = transformer
+            
+    def forward(self, x):
+        """
+        x: (batch_size, seq_len, channels, height, width)
+        """
+        batch_size, seq_len, c, h, w = x.shape
+        
+        # Combine batch and seq dimensions for CNN
+        # (B * T, C, H, W)
+        c_in = x.view(batch_size * seq_len, c, h, w)
+        
+        # Extract features
+        # Output: (B * T, feature_dim) where feature_dim is usually 512
+        features = self.feature_extractor(c_in)
+        
+        # Reshape back to sequence
+        # (B, T, feature_dim)
+        features = features.view(batch_size, seq_len, -1)
+        
+        # Pass through Transformer
+        output = self.transformer(features)
+        
+        return output

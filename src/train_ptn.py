@@ -10,8 +10,14 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 # Local imports
-from dataset import KeypointDataset
-from model import PoseTransformer
+import sys
+import os
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if PROJECT_ROOT not in sys.path:
+    sys.path.append(PROJECT_ROOT)
+
+from src.dataset import KeypointDataset
+from src.model import PoseTransformer
 
 
 def train_one_epoch(model, dataloader, criterion, optimizer, device):
@@ -91,14 +97,15 @@ def main():
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=2)
 
     # 3. Initialize Model
+    # Reduced model size for small dataset to prevent overfitting/underfitting
     model = PoseTransformer(
         input_dim=42,       # 21 landmarks * 2 (x,y)
         num_classes=num_classes,
-        d_model=128,
+        d_model=64,         # Reduced from 128
         nhead=4,
         num_layers=2,
-        dim_feedforward=256,
-        dropout=0.2,
+        dim_feedforward=128, # Reduced from 256
+        dropout=0.3,        # Increased dropout
         max_len=args.max_len
     ).to(device)
 
@@ -126,4 +133,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
