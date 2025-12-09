@@ -60,7 +60,7 @@ Thumbs.db
 # Data Files (large/generated)
 # =========================
 # Video files
-# videos_folder/
+videos_folder/
 # *.mp4
 # *.mov
 # *.avi
@@ -74,6 +74,12 @@ words/
 
 # Keypoint data
 keypoints_data/
+
+# CNN features
+cnn_features/
+
+# VideoMAE output
+videomae-asl/
 
 # =========================
 # Model Checkpoints

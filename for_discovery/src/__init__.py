@@ -1,1 +1,0 @@
-# ASL Training Package
