@@ -68,9 +68,10 @@ videos_folder/
 
 # Image datasets (keep images_folder in git if needed, otherwise uncomment)
 # images_folder/
+letters
 
 # Extracted frames
-words/
+#words/
 
 # Keypoint data
 keypoints_data/
