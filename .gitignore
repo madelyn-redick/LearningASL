@@ -70,7 +70,7 @@ videos_folder/
 # images_folder/
 
 # Extracted frames
-#words/
+words/
 
 # Keypoint data
 keypoints_data/
